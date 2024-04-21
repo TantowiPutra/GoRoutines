@@ -3,11 +3,15 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 func worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {
 	defer wg.Done()
+	fmt.Println("Worker Began Working...", id)
+	fmt.Println("Job Assigned..", len(jobs))
 	for job := range jobs {
+		fmt.Println("Job Assigned Inner..", len(jobs))
 		fmt.Printf("Worker %d started job %d\n", id, job)
 		// Simulate doing some work
 		result := job * 2
@@ -27,11 +31,14 @@ func main() {
 	for i := 1; i <= 3; i++ {
 		wg.Add(1)
 		go worker(i, jobs, results, &wg)
+		fmt.Println("Assigned Worker...", i)
 	}
 
 	// Send some jobs to the workers
 	for i := 1; i <= 10; i++ {
 		jobs <- i
+		fmt.Println("Assigned Jobs...", i)
+		time.Sleep(2 * time.Second)
 	}
 
 	close(jobs) // no more jobs send, close channel
